@@ -1,6 +1,7 @@
 package io.github.valtergabriell.mscards.infra.queue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.valtergabriell.mscards.application.CardService;
 import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
 import io.github.valtergabriell.mscards.application.domain.dto.RequestCardData;
@@ -20,8 +21,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class RequestCardSubscriber extends RandomValuesCreation implements RandomizeCardNumber, RandomizeSecurityCardNumber {
-    private final CardRepository cardRepository;
-    private final AccountCardRepository accountCardRepository;
+    private final CardService cardService;
 
     @RabbitListener(queues = "${mq.queues.create-card}")
     public void receiveCardsRequest(@Payload String payload) {
@@ -30,21 +30,13 @@ public class RequestCardSubscriber extends RandomValuesCreation implements Rando
             var mapper = new ObjectMapper();
             RequestCardData cardData = mapper.readValue(payload, RequestCardData.class);
             log.info("ok" + cardData.getCpf().toString());
+
+
             //saving card
-            Card card = new Card();
-            card.setCardId(UUID.randomUUID().toString());
-            card.setCardNumber(generateCardNumber(cardRepository));
-            card.setCardLimit(cardData.getCardLimit());
-            card.setCardSecurityNumber(generateSecurityNumber(cardRepository));
-            card.setExpireDate(LocalDate.now().plusYears(2));
-            cardRepository.save(card);
+            Card card = cardService.saveCard(cardData);
 
             //saving card to client
-            AccountCard accountCard = new AccountCard();
-            accountCard.setCardLimit(card.getCardLimit());
-            accountCard.setAccountCpf(cardData.getCpf());
-            accountCard.setCard(card);
-            accountCardRepository.save(accountCard);
+            cardService.saveAccountCard(card, cardData);
 
             log.info(card.toString());
 

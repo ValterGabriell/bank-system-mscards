@@ -1,5 +1,7 @@
 package io.github.valtergabriell.mscards.infra.queue;
 
+import io.github.valtergabriell.mscards.infra.repository.CardRepository;
+
 import java.util.Random;
 
 public class RandomValuesCreation {
@@ -12,6 +14,17 @@ public class RandomValuesCreation {
             stringBuilder.append(numberIntoString);
         }
         return stringBuilder.toString();
+    }
+
+    public String generateRandomValue(CardRepository cardRepository, int digit){
+        var finalNumber = createStringWithRandomNumbers(digit);
+        boolean cardNumberAlreadyExists = cardRepository.findByCardNumber(finalNumber).isPresent();
+
+        if (cardNumberAlreadyExists) {
+            generateRandomValue(cardRepository, digit);
+        }
+
+        return finalNumber;
     }
 
 
