@@ -1,8 +1,6 @@
 package io.github.valtergabriell.mscards.application.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
@@ -23,8 +21,20 @@ public class AccountCard {
     @Column(nullable = false)
     private BigDecimal cardLimit;
 
+    @Column(name = "current_limit", nullable = false)
+    private BigDecimal currentLimit;
+
+
     public Long getIdClientCard() {
         return idClientCard;
+    }
+
+    public BigDecimal getCurrentLimit() {
+        return currentLimit;
+    }
+
+    public void setCurrentLimit(BigDecimal currentLimit) {
+        this.currentLimit = currentLimit;
     }
 
     public void setIdClientCard(Long idClientCard) {

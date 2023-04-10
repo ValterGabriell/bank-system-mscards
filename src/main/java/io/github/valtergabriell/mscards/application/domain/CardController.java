@@ -1,14 +1,13 @@
 package io.github.valtergabriell.mscards.application.domain;
 
 import io.github.valtergabriell.mscards.application.CardService;
+import io.github.valtergabriell.mscards.application.domain.dto.BuyAprooved;
+import io.github.valtergabriell.mscards.application.domain.dto.BuyRequest;
+import io.github.valtergabriell.mscards.application.domain.dto.CommonResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("card")
@@ -18,15 +17,16 @@ public class CardController {
 
 
     @GetMapping(params = {"cpf"})
-    public ResponseEntity getAccountCardByCpf(@RequestParam String cpf) {
-        AccountCard client = cardService.getAccountCardByClientCpf(cpf);
-        return ResponseEntity.ok(client);
+    public ResponseEntity<CommonResponse<AccountCard>> getAccountCardByCpf(@RequestParam String cpf) {
+        CommonResponse<AccountCard> accountCardByClientCpf = cardService.getAccountCardByClientCpf(cpf);
+        return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
     }
 
-    @GetMapping()
-    public ResponseEntity getAllAccountsCard() {
-        List<AccountCard> client = cardService.getAllAccountCard();
-        return ResponseEntity.ok(client);
+
+    @PostMapping(value = "buy", params = {"cpf"})
+    public ResponseEntity<BuyAprooved> buySomething(@RequestParam String cpf, @RequestBody BuyRequest buyRequest) {
+        cardService.buySomething(cpf, buyRequest);
+        return new ResponseEntity<>(new BuyAprooved(), HttpStatus.OK);
     }
 
 
