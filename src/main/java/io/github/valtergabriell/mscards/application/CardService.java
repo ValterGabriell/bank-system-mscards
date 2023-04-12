@@ -3,6 +3,7 @@ package io.github.valtergabriell.mscards.application;
 
 import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
+import io.github.valtergabriell.mscards.application.domain.dto.BuyAprooved;
 import io.github.valtergabriell.mscards.application.domain.dto.BuyRequest;
 import io.github.valtergabriell.mscards.application.domain.dto.CommonResponse;
 import io.github.valtergabriell.mscards.application.domain.dto.RequestCardData;
@@ -11,6 +12,7 @@ import io.github.valtergabriell.mscards.infra.queue.RandomizeCardNumber;
 import io.github.valtergabriell.mscards.infra.queue.RandomizeSecurityCardNumber;
 import io.github.valtergabriell.mscards.infra.repository.AccountCardRepository;
 import io.github.valtergabriell.mscards.infra.repository.CardRepository;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,19 +77,23 @@ public class CardService extends RandomValuesCreation implements RandomizeCardNu
         return generateRandomValue(cardRepository, 3);
     }
 
-    public void buySomething(String cpf, BuyRequest buyRequest) {
+    public BuyAprooved buySomething(String cpf, BuyRequest buyRequest) {
         AccountCard accountCard = accountCardRepository.findByCpf(cpf);
-        if (accountCard != null) {
+        BuyAprooved buyAprooved = new BuyAprooved();
+
             BigDecimal currentAccountCardLimit = accountCard.getCurrentLimit();
             if (currentAccountCardLimit.intValue() > buyRequest.getBuyValue().intValue()) {
                 BigDecimal newCurrentLimit = currentAccountCardLimit.subtract(buyRequest.getBuyValue());
-                log.info("compra efetuada no valor " + buyRequest.getBuyValue().intValue());
                 accountCard.setCurrentLimit(newCurrentLimit);
-                log.info("novo limite setado de " + accountCard.getCurrentLimit());
+
+                buyAprooved.setMessage("compra efetuada no valor " + buyRequest.getBuyValue().intValue());
+                buyAprooved.setNewLimite(accountCard.getCurrentLimit());
+
                 accountCardRepository.save(accountCard);
             } else {
-                log.error("compra negada por falta de limite");
+                buyAprooved.setMessage("compra negada por falta de limite");
             }
-        }
+
+        return buyAprooved;
     }
 }

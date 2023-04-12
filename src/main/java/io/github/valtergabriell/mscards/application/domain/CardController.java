@@ -25,8 +25,8 @@ public class CardController {
 
     @PostMapping(value = "buy", params = {"cpf"})
     public ResponseEntity<BuyAprooved> buySomething(@RequestParam String cpf, @RequestBody BuyRequest buyRequest) {
-        cardService.buySomething(cpf, buyRequest);
-        return new ResponseEntity<>(new BuyAprooved(), HttpStatus.OK);
+        BuyAprooved buyAprooved = cardService.buySomething(cpf, buyRequest);
+        return new ResponseEntity<>(buyAprooved, HttpStatus.OK);
     }
 
 
