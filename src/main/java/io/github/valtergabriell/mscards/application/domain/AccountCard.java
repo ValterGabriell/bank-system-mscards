@@ -1,8 +1,10 @@
 package io.github.valtergabriell.mscards.application.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity(name = "account_card")
 public class AccountCard {
@@ -24,9 +26,16 @@ public class AccountCard {
     @Column(name = "current_limit", nullable = false)
     private BigDecimal currentLimit;
 
+    @OneToMany(targetEntity = ProductsBuyed.class, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<ProductsBuyed> productsBuyeds;
 
     public Long getIdClientCard() {
         return idClientCard;
+    }
+
+    public void setIdClientCard(Long idClientCard) {
+        this.idClientCard = idClientCard;
     }
 
     public BigDecimal getCurrentLimit() {
@@ -35,10 +44,6 @@ public class AccountCard {
 
     public void setCurrentLimit(BigDecimal currentLimit) {
         this.currentLimit = currentLimit;
-    }
-
-    public void setIdClientCard(Long idClientCard) {
-        this.idClientCard = idClientCard;
     }
 
     public String getCpf() {
@@ -63,5 +68,13 @@ public class AccountCard {
 
     public void setCardLimit(BigDecimal cardLimit) {
         this.cardLimit = cardLimit;
+    }
+
+    public List<ProductsBuyed> getProductsBuyeds() {
+        return productsBuyeds;
+    }
+
+    public void setProductsBuyeds(List<ProductsBuyed> productsBuyeds) {
+        this.productsBuyeds = productsBuyeds;
     }
 }

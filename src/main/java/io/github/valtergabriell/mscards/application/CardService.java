@@ -1,35 +1,39 @@
 package io.github.valtergabriell.mscards.application;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
-import io.github.valtergabriell.mscards.application.domain.dto.BuyAprooved;
-import io.github.valtergabriell.mscards.application.domain.dto.BuyRequest;
-import io.github.valtergabriell.mscards.application.domain.dto.CommonResponse;
-import io.github.valtergabriell.mscards.application.domain.dto.RequestCardData;
-import io.github.valtergabriell.mscards.infra.queue.RandomValuesCreation;
-import io.github.valtergabriell.mscards.infra.queue.RandomizeCardNumber;
-import io.github.valtergabriell.mscards.infra.queue.RandomizeSecurityCardNumber;
+import io.github.valtergabriell.mscards.application.domain.ProductsBuyed;
+import io.github.valtergabriell.mscards.application.domain.dto.*;
+import io.github.valtergabriell.mscards.infra.queue.received.RandomValuesCreation;
+import io.github.valtergabriell.mscards.infra.queue.send.EmitShop;
 import io.github.valtergabriell.mscards.infra.repository.AccountCardRepository;
 import io.github.valtergabriell.mscards.infra.repository.CardRepository;
-import jakarta.ws.rs.NotFoundException;
+import io.github.valtergabriell.mscards.infra.repository.ProductBuyedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class CardService extends RandomValuesCreation implements RandomizeCardNumber, RandomizeSecurityCardNumber {
+@RequiredArgsConstructor
+public class CardService extends RandomValuesCreation {
     private final CardRepository cardRepository;
     private final AccountCardRepository accountCardRepository;
+    private final ProductBuyedRepository productBuyedRepository;
+
+    private final EmitShop emitShop;
 
     public Card saveCard(RequestCardData cardData) {
+
+
         Card card = new Card();
         card.setCardId(UUID.randomUUID().toString());
         card.setCardNumber(generateCardNumber(cardRepository));
@@ -47,7 +51,6 @@ public class CardService extends RandomValuesCreation implements RandomizeCardNu
         accountCard.setCpf(cardData.getCpf());
         accountCard.setCard(card);
         accountCard.setCurrentLimit(card.getCardLimit());
-        log.info("account card salvo " + accountCard);
         accountCardRepository.save(accountCard);
     }
 
@@ -63,37 +66,65 @@ public class CardService extends RandomValuesCreation implements RandomizeCardNu
         return commonResponse;
     }
 
-    public List<AccountCard> getAllAccountCard() {
-        return accountCardRepository.findAll();
-    }
-
-    @Override
-    public String generateCardNumber(CardRepository cardRepository) {
+    private String generateCardNumber(CardRepository cardRepository) {
         return generateRandomValue(cardRepository, 13);
     }
 
-    @Override
-    public String generateSecurityNumber(CardRepository cardRepository) {
+    private String generateSecurityNumber(CardRepository cardRepository) {
         return generateRandomValue(cardRepository, 3);
     }
 
-    public BuyAprooved buySomething(String cpf, BuyRequest buyRequest) {
-        AccountCard accountCard = accountCardRepository.findByCpf(cpf);
-        BuyAprooved buyAprooved = new BuyAprooved();
+    public _BuyResponse buySomething(String cpf, BuyRequest buyRequest) throws JsonProcessingException {
+        buyRequest.setCpf(cpf);
 
-            BigDecimal currentAccountCardLimit = accountCard.getCurrentLimit();
-            if (currentAccountCardLimit.intValue() > buyRequest.getBuyValue().intValue()) {
-                BigDecimal newCurrentLimit = currentAccountCardLimit.subtract(buyRequest.getBuyValue());
-                accountCard.setCurrentLimit(newCurrentLimit);
+        //todo: verificar se a conta tem limite para compra
+        emitShop.requestCard(buyRequest);
+        _BuyResponse buyResponse = new _BuyResponse();
+        buyResponse.setMessage("produto aprovado");
+        buyResponse.setProduct(buyResponse.getProduct());
+        return buyResponse;
+    }
 
-                buyAprooved.setMessage("compra efetuada no valor " + buyRequest.getBuyValue().intValue());
-                buyAprooved.setNewLimite(accountCard.getCurrentLimit());
+    public CommonResponse<ProductsBuyed> getProductBuyedByProductId(String productId) throws ErroResponse {
+        Optional<ProductsBuyed> productsBuyed = productBuyedRepository.findById(productId);
+        if (productsBuyed.isPresent()) {
+            CommonResponse<ProductsBuyed> commonResponse = new CommonResponse<>();
+            commonResponse.setMessage("Tudo certo!");
+            commonResponse.setData(productsBuyed.get());
+            return commonResponse;
+        } else {
+            throw new ErroResponse("Produto não encontrado");
+        }
+    }
 
-                accountCardRepository.save(accountCard);
+    public PayInvoiceResponse payInvoice(String productId, PayInvoiceRequest payInvoiceRequest) {
+        Optional<ProductsBuyed> optionalProductsBuyed = productBuyedRepository.findById(productId);
+        PayInvoiceResponse payInvoiceResponse = new PayInvoiceResponse();
+        if (optionalProductsBuyed.isPresent()) {
+            ProductsBuyed productsBuyed = optionalProductsBuyed.get();
+            BigDecimal installmentsValue = productsBuyed.getInstallmentsValue();
+            int numberOfInstallmentToPay = payInvoiceRequest.getNumberOfInstallment();
+            BigDecimal totalValueToPay = installmentsValue.multiply(BigDecimal.valueOf(numberOfInstallmentToPay));
+
+            if (payInvoiceRequest.getPaymentValue().doubleValue() == totalValueToPay.doubleValue()) {
+                updateNumberOfInstallment(payInvoiceResponse, productsBuyed, numberOfInstallmentToPay);
+                BigDecimal currentAccountLimit = productsBuyed.getAccountCard().getCurrentLimit();
+                BigDecimal newCurrentAccountLimit = currentAccountLimit.add(totalValueToPay);
+                productsBuyed.getAccountCard().setCurrentLimit(newCurrentAccountLimit);
+                accountCardRepository.save(productsBuyed.getAccountCard());
             } else {
-                buyAprooved.setMessage("compra negada por falta de limite");
+                payInvoiceResponse.setMessage("Valor a ser pago " + totalValueToPay + "! Você está pagando " + payInvoiceRequest.getPaymentValue());
             }
 
-        return buyAprooved;
+        } else {
+            payInvoiceResponse.setMessage("Produto não encontrado");
+        }
+        return payInvoiceResponse;
+    }
+
+    private void updateNumberOfInstallment(PayInvoiceResponse payInvoiceResponse, ProductsBuyed productsBuyed, int numberOfInstallmentToPay) {
+        int newNumberOfInstallment = productsBuyed.getNumberOfInstallments() - numberOfInstallmentToPay;
+        productsBuyed.setNumberOfInstallments(newNumberOfInstallment);
+        payInvoiceResponse.setMessage("parcela paga!");
     }
 }

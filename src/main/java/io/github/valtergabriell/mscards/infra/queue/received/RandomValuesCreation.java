@@ -1,4 +1,4 @@
-package io.github.valtergabriell.mscards.infra.queue;
+package io.github.valtergabriell.mscards.infra.queue.received;
 
 import io.github.valtergabriell.mscards.infra.repository.CardRepository;
 
