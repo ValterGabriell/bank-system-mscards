@@ -1,5 +1,7 @@
 package io.github.valtergabriell.mscards.application.domain.dto;
 
+import io.github.valtergabriell.mscards.application.domain.AccountCard;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -7,6 +9,10 @@ public class BuyRequest {
     private BigDecimal buyValue;
     private String product;
     private int numberOfInstallments;
+
+    private String protocol;
+
+    private AccountCardDTO accountCard;
 
     private String cpf;
 
@@ -33,6 +39,14 @@ public class BuyRequest {
         return buyValue;
     }
 
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
     public String getProduct() {
         return product;
     }
@@ -43,5 +57,13 @@ public class BuyRequest {
 
     public void setBuyValue(BigDecimal buyValue) {
         this.buyValue = buyValue;
+    }
+
+    public AccountCardDTO getAccountCard() {
+        return accountCard;
+    }
+
+    public void setAccountCard(AccountCardDTO accountCard) {
+        this.accountCard = accountCard;
     }
 }

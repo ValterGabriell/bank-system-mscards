@@ -22,24 +22,24 @@ public class CardController {
         return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
     }
 
-    @GetMapping(params = {"productId"})
-    public ResponseEntity<CommonResponse<ProductsBuyed>> getProductByProductId(@RequestParam String productId) throws ErroResponse {
-        CommonResponse<ProductsBuyed> accountCardByClientCpf = cardService.getProductBuyedByProductId(productId);
-        return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
-    }
+//    @GetMapping(params = {"productId"})
+//    public ResponseEntity<CommonResponse<ProductsBuyed>> getProductByProductId(@RequestParam String productId) throws ErroResponse {
+//        CommonResponse<ProductsBuyed> accountCardByClientCpf = cardService.getProductBuyedByProductId(productId);
+//        return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
+//    }
 
 
     @PostMapping(value = "buy", params = {"cpf"})
-    public ResponseEntity<_BuyResponse> buySomething(@RequestParam String cpf, @RequestBody BuyRequest buyRequest) throws JsonProcessingException {
-        _BuyResponse buyResponse = cardService.buySomething(cpf, buyRequest);
+    public ResponseEntity<BuyResponse> buySomething(@RequestParam String cpf, @RequestBody BuyRequest buyRequest) throws JsonProcessingException {
+        BuyResponse buyResponse = cardService.buySomething(cpf, buyRequest);
         return new ResponseEntity<>(buyResponse, HttpStatus.OK);
     }
 
-    @PostMapping(value = "pay", params = {"productId"})
-    public ResponseEntity<PayInvoiceResponse> buySomething(@RequestParam String productId, @RequestBody PayInvoiceRequest invoiceRequest) {
-        PayInvoiceResponse payInvoiceResponse = cardService.payInvoice(productId, invoiceRequest);
-        return new ResponseEntity<>(payInvoiceResponse, HttpStatus.OK);
-    }
+//    @PostMapping(value = "pay", params = {"productId"})
+//    public ResponseEntity<PayInvoiceResponse> buySomething(@RequestParam String productId, @RequestBody PayInvoiceRequest invoiceRequest) {
+//        PayInvoiceResponse payInvoiceResponse = cardService.payInvoice(productId, invoiceRequest);
+//        return new ResponseEntity<>(payInvoiceResponse, HttpStatus.OK);
+//    }
 
 
 }

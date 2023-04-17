@@ -1,10 +1,10 @@
 package io.github.valtergabriell.mscards.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.github.valtergabriell.mscards.application.domain.dto.AccountCardDTO;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity(name = "account_card")
 public class AccountCard {
@@ -26,9 +26,22 @@ public class AccountCard {
     @Column(name = "current_limit", nullable = false)
     private BigDecimal currentLimit;
 
-    @OneToMany(targetEntity = ProductsBuyed.class, cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<ProductsBuyed> productsBuyeds;
+    private String productId;
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
+    }
+
+    public AccountCardDTO toDto() {
+        return new AccountCardDTO(
+                this.idClientCard, this.cpf, this.cardLimit, this.currentLimit
+        );
+    }
 
     public Long getIdClientCard() {
         return idClientCard;
@@ -70,11 +83,4 @@ public class AccountCard {
         this.cardLimit = cardLimit;
     }
 
-    public List<ProductsBuyed> getProductsBuyeds() {
-        return productsBuyeds;
-    }
-
-    public void setProductsBuyeds(List<ProductsBuyed> productsBuyeds) {
-        this.productsBuyeds = productsBuyeds;
-    }
 }
