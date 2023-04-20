@@ -6,10 +6,10 @@ import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
 import io.github.valtergabriell.mscards.application.domain.ProductsBuyed;
 import io.github.valtergabriell.mscards.application.domain.dto.*;
-import io.github.valtergabriell.mscards.infra.queue.received.RandomValuesCreation;
 import io.github.valtergabriell.mscards.infra.queue.send.EmitShop;
 import io.github.valtergabriell.mscards.infra.repository.AccountCardRepository;
 import io.github.valtergabriell.mscards.infra.repository.CardRepository;
+import io.github.valtergabriell.mscards.infra.repository.RequestDelete;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,8 +24,7 @@ import java.util.UUID;
 public class CardService extends RandomValuesCreation {
     private final CardRepository cardRepository;
     private final AccountCardRepository accountCardRepository;
-//    private final ProductBuyedRepository productBuyedRepository;
-
+    private final RequestDelete requestDelete;
     private final EmitShop emitShop;
 
     public Card saveCard(RequestCardData cardData) {
@@ -97,31 +96,12 @@ public class CardService extends RandomValuesCreation {
         return buyResponse;
     }
 
-
-//    public PayInvoiceResponse payInvoice(String productId, PayInvoiceRequest payInvoiceRequest) {
-//        Optional<ProductsBuyed> optionalProductsBuyed = productBuyedRepository.findById(productId);
-//        PayInvoiceResponse payInvoiceResponse = new PayInvoiceResponse();
-//        if (optionalProductsBuyed.isPresent()) {
-//            ProductsBuyed productsBuyed = optionalProductsBuyed.get();
-//            BigDecimal installmentsValue = productsBuyed.getInstallmentsValue();
-//            int numberOfInstallmentToPay = payInvoiceRequest.getNumberOfInstallment();
-//            BigDecimal totalValueToPay = installmentsValue.multiply(BigDecimal.valueOf(numberOfInstallmentToPay));
-//
-//            if (payInvoiceRequest.getPaymentValue().doubleValue() == totalValueToPay.doubleValue()) {
-//                updateNumberOfInstallment(payInvoiceResponse, productsBuyed, numberOfInstallmentToPay);
-//                BigDecimal currentAccountLimit = productsBuyed.getAccountCard().getCurrentLimit();
-//                BigDecimal newCurrentAccountLimit = currentAccountLimit.add(totalValueToPay);
-//                productsBuyed.getAccountCard().setCurrentLimit(newCurrentAccountLimit);
-//                accountCardRepository.save(productsBuyed.getAccountCard());
-//            } else {
-//                payInvoiceResponse.setMessage("Valor a ser pago " + totalValueToPay + "! Você está pagando " + payInvoiceRequest.getPaymentValue());
-//            }
-//
-//        } else {
-//            payInvoiceResponse.setMessage("Produto não encontrado");
-//        }
-//        return payInvoiceResponse;
-//    }
+    public void deleteCardAccount(String cpf){
+        //todo: excecao caso nao exista o cpf
+        AccountCard accountCard = accountCardRepository.findByCpf(cpf);
+        accountCardRepository.delete(accountCard);
+        requestDelete.deleteAccountData(cpf);
+    }
 
     private void updateNumberOfInstallment(PayInvoiceResponse payInvoiceResponse, ProductsBuyed productsBuyed, int numberOfInstallmentToPay) {
         int newNumberOfInstallment = productsBuyed.getNumberOfInstallments() - numberOfInstallmentToPay;

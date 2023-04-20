@@ -12,4 +12,5 @@ public interface AccountCardRepository extends JpaRepository<AccountCard, Long> 
     AccountCard findByCpf(String cpf);
 
 
+    void deleteByCpf(String cpf);
 }

@@ -22,12 +22,11 @@ public class CardController {
         return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
     }
 
-//    @GetMapping(params = {"productId"})
-//    public ResponseEntity<CommonResponse<ProductsBuyed>> getProductByProductId(@RequestParam String productId) throws ErroResponse {
-//        CommonResponse<ProductsBuyed> accountCardByClientCpf = cardService.getProductBuyedByProductId(productId);
-//        return new ResponseEntity<>(accountCardByClientCpf, HttpStatus.OK);
-//    }
-
+    @DeleteMapping(params = "cpf")
+    public ResponseEntity deleteAccountData(@RequestParam("cpf") String cpf) {
+        cardService.deleteCardAccount(cpf);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping(value = "buy", params = {"cpf"})
     public ResponseEntity<BuyResponse> buySomething(@RequestParam String cpf, @RequestBody BuyRequest buyRequest) throws JsonProcessingException {
@@ -36,7 +35,7 @@ public class CardController {
     }
 
 //    @PostMapping(value = "pay", params = {"productId"})
-//    public ResponseEntity<PayInvoiceResponse> buySomething(@RequestParam String productId, @RequestBody PayInvoiceRequest invoiceRequest) {
+//    public ResponseEntity<PayInvoiceResponse> payInvoice(@RequestParam String productId, @RequestBody PayInvoiceRequest invoiceRequest) {
 //        PayInvoiceResponse payInvoiceResponse = cardService.payInvoice(productId, invoiceRequest);
 //        return new ResponseEntity<>(payInvoiceResponse, HttpStatus.OK);
 //    }

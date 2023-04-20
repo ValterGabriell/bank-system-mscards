@@ -2,6 +2,7 @@ package io.github.valtergabriell.mscards.infra.queue.received;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.valtergabriell.mscards.application.CardService;
+import io.github.valtergabriell.mscards.application.RandomValuesCreation;
 import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
