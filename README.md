@@ -110,6 +110,31 @@ http://localhost:8080/card
 
 ```
 
+<h1>DELETE</h1></br>
+
+<h2>Deletar conta de usuário</h2>
+<table>
+  <tr>
+    <th>Request</th>
+    <th>Response</th>
+    <th>Query</th>
+  </tr>
+  <tr>
+    <td>/</td>
+    <td>Busca cliente no database e deleta conta de usuario com seus cartoes caso ela exista e não tenha pendências</td>
+    <td>cpf cliente</td>
+  </tr>
+</table>
+
+
+
+<h3>Resposta esperada</h3></br>
+
+```
+204 - No Content
+
+```
+
 </br>
 
 <h1>Créditos</h1>
