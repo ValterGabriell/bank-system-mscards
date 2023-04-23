@@ -9,6 +9,7 @@ Este é um projeto que deve ser rodado após o Eureka Server estar rodando, para
 <!--ts-->
    * [Como usar?](#como-usar)
    * [Endpoints](#endpoints)
+   * [Testes](#testes)
    * [Creditos](#creditos)
 <!--te-->
   
@@ -136,6 +137,93 @@ http://localhost:8080/card
 ```
 
 </br>
+
+
+<h1>Testes</h1>
+
+<h4>Setup</h4>
+
+```
+    private RequestCardDataMock requestCardData;
+    private BuyRequest buyRequest;
+
+    @BeforeEach
+    void setup() {
+        requestCardData = new RequestCardDataMock();
+        requestCardData.setCpf("00021645400");
+        buyRequest = new BuyRequest();
+        buyRequest.setProductValue(BigDecimal.valueOf(3500));
+    }
+
+```
+
+<h3>Verifica se o CPF tem 11 digitos</h3></br>
+
+```
+   @Test
+    @DisplayName(" it should return true when cpf have 11 chars")
+    public void itShouldReturnTrueWhenCpfHave11Chars(){
+        int cpf = requestCardData.getCpf().length();
+        Assertions.assertEquals(11, cpf);
+    }
+    
+```
+
+<h3>Verifica se o CPF contém apenas numeros</h3></br>
+
+
+```
+    @Test
+    @DisplayName("cpf must contains only numbers and return false if is not")
+    public void itShouldReturnTrueWhenCpfHaveOnlyNumbers() {
+        String regex = "^[0-9]+$";
+        String cpf = requestCardData.getCpf();
+        boolean matches = cpf.matches(regex);
+        Assertions.assertTrue(matches);
+    }
+    
+```
+
+<h3>Verifica se o numero do cartao tem 13 digitos</h3></br>
+
+
+```
+  @Test
+    void itShouldReturnTrueIfCardNumberHas13Digits() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 13; i++) {
+            var random = new Random().nextInt(10);
+            var numberIntoString = String.valueOf(random);
+            stringBuilder.append(numberIntoString);
+        }
+        var stringFinal = stringBuilder.toString();
+        assertEquals(13, stringFinal.length());
+    }
+    
+```
+
+<h3>Verifica se o valor da compra é maior que zero</h3></br>
+
+
+```
+     @Test
+    @DisplayName("product value should be bigger than zero")
+    public void itShouldReturnTrueWhenProductValueBiggerThanZero() {
+        BigDecimal productValue = buyRequest.getProductValue();
+        int i = productValue.intValue();
+        Assertions.assertTrue(i > 0);
+    }
+    
+```
+
+
+
+
+
+
+
+
+
 
 <h1>Créditos</h1>
 
