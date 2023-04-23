@@ -29,13 +29,14 @@ public class CardService extends RandomValuesCreation {
 
     public Card saveCard(RequestCardData cardData) {
         Card card = new Card();
-        card.setCardId(UUID.randomUUID().toString());
-        card.setCardNumber(generateCardNumber(cardRepository));
-        card.setCardLimit(cardData.getCardLimit());
-        card.setCardSecurityNumber(generateSecurityNumber(cardRepository));
-        card.setExpireDate(LocalDate.now().plusYears(2));
-        cardRepository.save(card);
-        log.info("card salvo - numero cartao: " + card.getCardNumber());
+        if (cardData.isCpfLenghtEqual11()){
+            card.setCardId(UUID.randomUUID().toString());
+            card.setCardNumber(generateCardNumber(cardRepository));
+            card.setCardLimit(cardData.getCardLimit());
+            card.setCardSecurityNumber(generateSecurityNumber(cardRepository));
+            card.setExpireDate(LocalDate.now().plusYears(2));
+            cardRepository.save(card);
+        }
         return card;
     }
 
