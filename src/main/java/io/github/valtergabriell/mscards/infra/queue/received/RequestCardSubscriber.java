@@ -2,7 +2,7 @@ package io.github.valtergabriell.mscards.infra.queue.received;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.valtergabriell.mscards.application.CardService;
-import io.github.valtergabriell.mscards.application.RandomValuesCreation;
+import io.github.valtergabriell.mscards.application.helpers.CreateRandomNumbersToCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
 import io.github.valtergabriell.mscards.application.domain.dto.RequestCardData;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class RequestCardSubscriber extends RandomValuesCreation {
+public class RequestCardSubscriber extends CreateRandomNumbersToCard {
     private final CardService cardService;
 
     @RabbitListener(queues = "create-card-queue")
@@ -25,8 +25,6 @@ public class RequestCardSubscriber extends RandomValuesCreation {
             RequestCardData cardData = mapper.readValue(payload, RequestCardData.class);
             //saving card
             Card card = cardService.saveCard(cardData);
-            //saving card to client
-            cardService.saveAccoundCard(card, cardData);
         } catch (Exception e) {
             log.error("Erro ao receber solicitação de emissão de cartão: {}", e.getMessage());
         }

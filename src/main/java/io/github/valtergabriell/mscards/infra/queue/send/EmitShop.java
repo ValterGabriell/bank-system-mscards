@@ -15,12 +15,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmitShop {
     private final RabbitTemplate rabbitTemplate;
-    private final Queue createCardQueue;
+    private final Queue purchaseQueue;
 
-    public void requestCard(BuyRequest buyRequest) throws JsonProcessingException {
+    public void requestPurchase(BuyRequest buyRequest) throws JsonProcessingException {
         try {
             var json = convertToJsonString(buyRequest);
-            rabbitTemplate.convertAndSend(createCardQueue.getName(), json);
+            rabbitTemplate.convertAndSend(purchaseQueue.getName(), json);
         } catch (Exception e) {
             log.error(e.getMessage());
         }

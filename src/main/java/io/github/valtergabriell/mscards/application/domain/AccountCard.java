@@ -1,7 +1,7 @@
 package io.github.valtergabriell.mscards.application.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.github.valtergabriell.mscards.application.domain.dto.AccountCardDTO;
+import io.github.valtergabriell.mscards.application.domain.dto.AccountCardWithNotPassCard;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -37,8 +37,8 @@ public class AccountCard {
         this.productId = productId;
     }
 
-    public AccountCardDTO toDto() {
-        return new AccountCardDTO(
+    public AccountCardWithNotPassCard toDto() {
+        return new AccountCardWithNotPassCard(
                 this.idClientCard, this.cpf, this.cardLimit, this.currentLimit
         );
     }

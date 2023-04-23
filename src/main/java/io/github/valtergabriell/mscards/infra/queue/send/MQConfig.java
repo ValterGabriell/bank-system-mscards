@@ -9,7 +9,7 @@ public class MQConfig {
 
     @Bean
     public Queue createQueue() {
-        String queue = "shopping-queue";
+        String queue = "purchase-queue";
         return new Queue(queue, true);
     }
 }

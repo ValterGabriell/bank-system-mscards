@@ -1,20 +1,20 @@
 package io.github.valtergabriell.mscards.application.domain.dto;
 
-import io.github.valtergabriell.mscards.application.domain.AccountCard;
-
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class BuyRequest {
-    private BigDecimal buyValue;
+    private BigDecimal productValue;
     private String product;
     private int numberOfInstallments;
 
     private String protocol;
 
-    private AccountCardDTO accountCard;
+    private AccountCardWithNotPassCard accountCard;
 
     private String cpf;
+
+    public BuyRequest() {
+    }
 
     public String getCpf() {
         return cpf;
@@ -22,9 +22,6 @@ public class BuyRequest {
 
     public void setCpf(String cpf) {
         this.cpf = cpf;
-    }
-
-    public BuyRequest() {
     }
 
     public int getNumberOfInstallments() {
@@ -35,8 +32,12 @@ public class BuyRequest {
         this.numberOfInstallments = numberOfInstallments;
     }
 
-    public BigDecimal getBuyValue() {
-        return buyValue;
+    public BigDecimal getProductValue() {
+        return productValue;
+    }
+
+    public void setProductValue(BigDecimal productValue) {
+        this.productValue = productValue;
     }
 
     public String getProtocol() {
@@ -55,15 +56,17 @@ public class BuyRequest {
         this.product = product;
     }
 
-    public void setBuyValue(BigDecimal buyValue) {
-        this.buyValue = buyValue;
-    }
-
-    public AccountCardDTO getAccountCard() {
+    public AccountCardWithNotPassCard getAccountCard() {
         return accountCard;
     }
 
-    public void setAccountCard(AccountCardDTO accountCard) {
+    public void setAccountCard(AccountCardWithNotPassCard accountCard) {
         this.accountCard = accountCard;
+    }
+
+    public boolean isProductValueBiggerThanZero() {
+        BigDecimal productValue = getProductValue();
+        int i = productValue.intValue();
+        return i > 0;
     }
 }

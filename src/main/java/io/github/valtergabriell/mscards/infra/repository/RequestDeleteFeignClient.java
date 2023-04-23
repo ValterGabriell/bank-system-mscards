@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value = "msaccount", path = "/account")
-public interface RequestDelete {
+public interface RequestDeleteFeignClient {
     @DeleteMapping(params = "cpf")
     void deleteAccountData(@RequestParam("cpf") String cpf);
 }

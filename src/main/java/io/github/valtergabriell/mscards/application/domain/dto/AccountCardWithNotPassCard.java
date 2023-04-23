@@ -2,7 +2,7 @@ package io.github.valtergabriell.mscards.application.domain.dto;
 
 import java.math.BigDecimal;
 
-public class AccountCardDTO {
+public class AccountCardWithNotPassCard {
     private Long idClientCard;
 
     private String cpf;
@@ -11,7 +11,7 @@ public class AccountCardDTO {
 
     private BigDecimal currentLimit;
 
-    public AccountCardDTO(Long idClientCard, String cpf, BigDecimal cardLimit, BigDecimal currentLimit) {
+    public AccountCardWithNotPassCard(Long idClientCard, String cpf, BigDecimal cardLimit, BigDecimal currentLimit) {
         this.idClientCard = idClientCard;
         this.cpf = cpf;
         this.cardLimit = cardLimit;
