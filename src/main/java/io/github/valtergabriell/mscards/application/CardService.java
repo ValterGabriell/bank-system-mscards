@@ -97,7 +97,7 @@ public class CardService extends RandomValuesCreation {
     }
 
     public void deleteCardAccount(String cpf){
-        //todo: excecao caso nao exista o cpf
+        //todo: excecao caso nao exista o cpf; verificar se o usuario possui pendencias de conta
         AccountCard accountCard = accountCardRepository.findByCpf(cpf);
         accountCardRepository.delete(accountCard);
         requestDelete.deleteAccountData(cpf);
