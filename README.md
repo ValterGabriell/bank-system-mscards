@@ -1,4 +1,4 @@
-<h1 align="center">Microserviços de avaliação de criação de cartões - Sistema Bancário</h1>
+<h1 align="center">Microserviços de avaliação de criação de cartões - Empresa de Software</h1>
 <p align="center"><i>Repositório responsável receber a requisição de criar cartão da fila do RabbitMQ e processar ela.</i></p>
 
 ##  Sobre esse projeto
