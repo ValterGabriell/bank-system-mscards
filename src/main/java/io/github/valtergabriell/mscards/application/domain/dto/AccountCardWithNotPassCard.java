@@ -5,15 +5,15 @@ import java.math.BigDecimal;
 public class AccountCardWithNotPassCard {
     private Long idClientCard;
 
-    private String cpf;
+    private String identifier;
 
     private BigDecimal cardLimit;
 
     private BigDecimal currentLimit;
 
-    public AccountCardWithNotPassCard(Long idClientCard, String cpf, BigDecimal cardLimit, BigDecimal currentLimit) {
+    public AccountCardWithNotPassCard(Long idClientCard, String identifier, BigDecimal cardLimit, BigDecimal currentLimit) {
         this.idClientCard = idClientCard;
-        this.cpf = cpf;
+        this.identifier = identifier;
         this.cardLimit = cardLimit;
         this.currentLimit = currentLimit;
     }
@@ -22,8 +22,8 @@ public class AccountCardWithNotPassCard {
         return idClientCard;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getIdentifier() {
+        return identifier;
     }
 
     public BigDecimal getCardLimit() {

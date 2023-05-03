@@ -5,10 +5,10 @@ import java.math.BigDecimal;
 
 public class RequestCardData {
     private BigDecimal cardLimit;
-    private String cpf;
+    private String identifier;
 
-    public String getCpf() {
-        return cpf;
+    public String getIdentifier() {
+        return identifier;
     }
 
     public BigDecimal getCardLimit() {

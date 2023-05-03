@@ -11,17 +11,17 @@ public class BuyRequest {
 
     private AccountCardWithNotPassCard accountCard;
 
-    private String cpf;
+    private String identifier;
 
     public BuyRequest() {
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public int getNumberOfInstallments() {
@@ -64,9 +64,5 @@ public class BuyRequest {
         this.accountCard = accountCard;
     }
 
-    public boolean isProductValueBiggerThanZero() {
-        BigDecimal productValue = getProductValue();
-        int i = productValue.intValue();
-        return i > 0;
-    }
+
 }

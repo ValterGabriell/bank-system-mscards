@@ -1,4 +1,4 @@
-package io.github.valtergabriell.mscards.infra.queue.send;
+package io.github.valtergabriell.mscards.infra.queue;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;

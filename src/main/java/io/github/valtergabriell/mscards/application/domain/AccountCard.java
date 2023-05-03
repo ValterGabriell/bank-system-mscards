@@ -13,8 +13,8 @@ public class AccountCard {
     @Column(nullable = false)
     private Long idClientCard;
 
-    @Column(name = "cpf", nullable = false)
-    private String cpf;
+    @Column(name = "identifier", nullable = false)
+    private String identifier;
 
     @ManyToOne
     @JoinColumn(name = "card_id")
@@ -39,7 +39,7 @@ public class AccountCard {
 
     public AccountCardWithNotPassCard toDto() {
         return new AccountCardWithNotPassCard(
-                this.idClientCard, this.cpf, this.cardLimit, this.currentLimit
+                this.idClientCard, this.identifier, this.cardLimit, this.currentLimit
         );
     }
 
@@ -59,12 +59,12 @@ public class AccountCard {
         this.currentLimit = currentLimit;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public Card getCard() {

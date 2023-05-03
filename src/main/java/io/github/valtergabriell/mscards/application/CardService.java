@@ -6,7 +6,7 @@ import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
 import io.github.valtergabriell.mscards.application.domain.ProductsBuyed;
 import io.github.valtergabriell.mscards.application.domain.dto.*;
-import io.github.valtergabriell.mscards.application.helpers.CpfValidation;
+import io.github.valtergabriell.mscards.application.helpers.IdentifierValidation;
 import io.github.valtergabriell.mscards.application.helpers.CreateRandomNumbersToCard;
 import io.github.valtergabriell.mscards.excpetions.RequestException;
 import io.github.valtergabriell.mscards.infra.queue.send.EmitShop;
@@ -34,10 +34,10 @@ public class CardService extends CreateRandomNumbersToCard {
     private final EmitShop emitShop;
 
     public Card saveCard(RequestCardData cardData) {
-        CpfValidation cpfValidation = new CpfValidation();
+        IdentifierValidation identifierValidation = new IdentifierValidation();
         Card card = new Card();
-        if (cpfValidation.isCpfLenghtEqual11(cardData.getCpf())
-                && cpfValidation.isCpfContainsOnlyNumbers(cardData.getCpf())) {
+        if (identifierValidation.isIdLenghtEqual11or14(cardData.getIdentifier())
+                && identifierValidation.isIdentififerContainsOnlyNumbers(cardData.getIdentifier())) {
             card.setCardId(UUID.randomUUID().toString());
             card.setCardNumber(generateCardNumber(cardRepository));
             card.setCardLimit(cardData.getCardLimit());
@@ -53,17 +53,17 @@ public class CardService extends CreateRandomNumbersToCard {
     private void saveAccoundCard(Card card, RequestCardData cardData) {
         AccountCard accountCard = new AccountCard();
         accountCard.setCardLimit(card.getCardLimit());
-        accountCard.setCpf(cardData.getCpf());
+        accountCard.setIdentifier(cardData.getIdentifier());
         accountCard.setCard(card);
         accountCard.setCurrentLimit(card.getCardLimit());
         accountCardRepository.save(accountCard);
-        log.info("Conta de cartao salva - cpf da conta: " + accountCard.getCpf());
+        log.info("Conta de cartao salva - id da conta: " + accountCard.getIdentifier());
     }
 
     public void updateCurrentLimitAfterBuy(AccountCard accountCard) {
-        CpfValidation cpfValidation = new CpfValidation();
-        if (cpfValidation.isCpfLenghtEqual11(accountCard.getCpf()) && cpfValidation.isCpfContainsOnlyNumbers(accountCard.getCpf())) {
-            AccountCard currentAccountCard = accountCardRepository.findByCpf(accountCard.getCpf());
+        IdentifierValidation identifierValidation = new IdentifierValidation();
+        if (identifierValidation.isIdLenghtEqual11or14(accountCard.getIdentifier()) && identifierValidation.isIdentififerContainsOnlyNumbers(accountCard.getIdentifier())) {
+            AccountCard currentAccountCard = accountCardRepository.findByIdentifier(accountCard.getIdentifier());
             if (currentAccountCard == null) {
                 throw new RequestException(USER_NOT_FOUND);
             }
@@ -72,11 +72,11 @@ public class CardService extends CreateRandomNumbersToCard {
         }
     }
 
-    public CommonResponse<AccountCard> getAccountCardByClientCpf(String cpf) {
-        CpfValidation cpfValidation = new CpfValidation();
+    public CommonResponse<AccountCard> getAccountCardByClientIdentifier(String id) {
+        IdentifierValidation identifierValidation = new IdentifierValidation();
         CommonResponse<AccountCard> commonResponse = null;
-        if (cpfValidation.isCpfLenghtEqual11(cpf) && cpfValidation.isCpfContainsOnlyNumbers(cpf)) {
-            AccountCard accountCard = accountCardRepository.findByCpf(cpf);
+        if (identifierValidation.isIdLenghtEqual11or14(id) && identifierValidation.isIdentififerContainsOnlyNumbers(id)) {
+            AccountCard accountCard = accountCardRepository.findByIdentifier(id);
             if (accountCard != null) {
                 commonResponse = new CommonResponse<>();
                 commonResponse.setData(accountCard);
@@ -96,15 +96,19 @@ public class CardService extends CreateRandomNumbersToCard {
         return generateRandomValueToCard(cardRepository, 3);
     }
 
-    public BuyResponse buySomething(String cpf, BuyRequest buyRequest) throws JsonProcessingException {
-        CpfValidation cpfValidation = new CpfValidation();
+    private boolean isProductValueBiggerThanZero(BigDecimal productValue) {
+        int i = productValue.intValue();
+        return i > 0;
+    }
+    public BuyResponse buySomething(String id, BuyRequest buyRequest) throws JsonProcessingException {
+        IdentifierValidation identifierValidation = new IdentifierValidation();
         BuyResponse buyResponse = null;
-        if (cpfValidation.isCpfLenghtEqual11(cpf)
-                && cpfValidation.isCpfContainsOnlyNumbers(cpf)
-                && buyRequest.isProductValueBiggerThanZero()) {
+        if (identifierValidation.isIdLenghtEqual11or14(id)
+                && identifierValidation.isIdentififerContainsOnlyNumbers(id)
+                && isProductValueBiggerThanZero(buyRequest.getProductValue())) {
 
-            buyRequest.setCpf(cpf);
-            AccountCard accountCard = accountCardRepository.findByCpf(cpf);
+            buyRequest.setIdentifier(id);
+            AccountCard accountCard = accountCardRepository.findByIdentifier(id);
             if (accountCard == null) {
                 throw new RequestException(USER_NOT_FOUND);
             }
@@ -125,16 +129,16 @@ public class CardService extends CreateRandomNumbersToCard {
         return buyResponse;
     }
 
-    public void deleteCardAccount(String cpf) {
+    public void deleteCardAccount(String id) {
         //todo: verificar se o usuario possui pendencias de conta
-        CpfValidation cpfValidation = new CpfValidation();
-        if (cpfValidation.isCpfLenghtEqual11(cpf) && cpfValidation.isCpfContainsOnlyNumbers(cpf)) {
-            AccountCard accountCard = accountCardRepository.findByCpf(cpf);
+        IdentifierValidation identifierValidation = new IdentifierValidation();
+        if (identifierValidation.isIdLenghtEqual11or14(id) && identifierValidation.isIdentififerContainsOnlyNumbers(id)) {
+            AccountCard accountCard = accountCardRepository.findByIdentifier(id);
             if (accountCard == null) {
                 throw new RequestException(USER_NOT_FOUND);
             }
             accountCardRepository.delete(accountCard);
-            requestDelete.deleteAccountData(cpf);
+            requestDelete.deleteAccountData(id);
         }
     }
 
