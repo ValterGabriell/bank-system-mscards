@@ -18,12 +18,14 @@ Este é um projeto que deve ser rodado após o Eureka Server estar rodando, para
 <p>Clone ou baixe o repositório e start ele através de sua IDE de preferência rodando o método main da classe principal na pasta raíz da aplicação, feito isso, basta começar a usar :). O ideal é startar todos os outros microserviços antes de testar a aplicação.</p>
 <p>Além disso, é fundamental ter um container do RabbitMQ no Docker rodando com usuario e senha padrao (guest, guest) para o microserviço poder receber a requisição da fila.</p>
 
-1 -> <a href="https://github.com/ValterGabriell/bank-system-eureka-server">Eureka Server</a></br>
+1 -> <a href="https://github.com/ValterGabriell/bank-system-msaccount">Microserviço responsável por criar contas bancárias dos usuários</a></br>
 2 -> <a href="https://github.com/ValterGabriell/bank-system-mscards">Microserviço responsável por criar cartões para os usuários</a></br>
 3 -> <a href="https://github.com/ValterGabriell/bank-system-mscreditappraiser">Microserviço responsável verificar o crédito que o usuário terá e solicitar a emissão de cartão</a></br>
 4 -> <a href="https://github.com/ValterGabriell/software-company-mslead">Microserviço responsável pela criação dos líderes das squads</a></br>
 5 -> <a href="https://github.com/ValterGabriell/software-company-mscolaborators">Microserviço responsável pela criação dos colaboradores das squads</a></br>
-6 -> <a href="https://github.com/ValterGabriell/bank-system-gateway">Gateway para fazer o loadbalancer dos microserviços</a></br>
+6 -> <a href="https://github.com/ValterGabriell/software-company-msjobs">Microserviço responsável pela criação dos trabalhos dos colaboradores</a></br>
+7 -> <a href="https://github.com/ValterGabriell/bank-system-gateway">Gateway para fazer o loadbalancer dos microserviços</a></br>
+8 -> <a href="https://github.com/ValterGabriell/software-company-msshopping">Micro serviço responsável por gerenciar as compras dos clientes.</a></br>
 
 
   
@@ -46,7 +48,7 @@ http://localhost:8080/card
   <tr>
     <td>/buy</td>
     <td>realizar compra</td>
-    <td>cpf do cliente</td>
+    <td>id</td>
   </tr> 
   </table>
   
@@ -54,7 +56,9 @@ http://localhost:8080/card
 
 ```bash
 {
-	"buyValue":1000
+	"productValue":924,
+	"product":"telefone motorola 8",
+	"numberOfInstallments":4
 }
 ```
 
@@ -62,9 +66,9 @@ http://localhost:8080/card
 
 ```bash
 {
-	"message": compra efetuada no valor 1000" ,
-	"newLimite": 1925.0,
-	"headerLocation": null
+	"message": "produto aprovado",
+	"product": "telefone motorola 8",
+	"protocol": "09f25f46-55aa-43ae-a1b6-e2c48d2c1efd"
 }
 ```
 
@@ -77,13 +81,11 @@ http://localhost:8080/card
     <th>Request</th>
     <th>Response</th>
     <th>Query</th>
-    <th>URL</th>
   </tr>
   <tr>
     <td>/</td>
     <td>Busca dados do cliente</td>
-    <td>cpf cliente</td>
-    <td>http://localhost:9090/card?cpf=cpfCliente</td>
+    <td>id</td>
   </tr>
 </table>
 
@@ -92,20 +94,19 @@ http://localhost:8080/card
 <h3>Resposta esperada</h3></br>
 
 ```
-
 {
 	"data": {
 		"idClientCard": 1,
-		"cpf": "22324671912",
+		"identifier": "63856573232",
 		"card": {
-			"cardId": "708b7164-e7c2-4983-849b-3c5fb7bbef3f",
-			"cardLimit": 2925.00,
-			"cardSecurityNumber": "096",
-			"cardNumber": "9949604766967",
-			"expireDate": "2025-04-10"
+			"cardId": "27ffc99c-ccce-41ad-b13b-06f85c0bdb8c",
+			"cardLimit": 1400.00,
+			"cardSecurityNumber": "819",
+			"cardNumber": "8200179374080",
+			"expireDate": "2025-05-03"
 		},
-		"cardLimit": 2925.00,
-		"currentLimit": 1925.00
+		"cardLimit": 1400.00,
+		"currentLimit": 476.00
 	},
 	"message": "Tudo certo!",
 	"headerLocation": null
@@ -125,7 +126,7 @@ http://localhost:8080/card
   <tr>
     <td>/</td>
     <td>Busca cliente no database e deleta conta de usuario com seus cartoes caso ela exista e não tenha pendências</td>
-    <td>cpf cliente</td>
+    <td>id</td>
   </tr>
 </table>
 
