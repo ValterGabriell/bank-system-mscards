@@ -17,7 +17,7 @@ public class EmitShop {
     private final RabbitTemplate rabbitTemplate;
     private final Queue purchaseQueue;
 
-    public void requestPurchase(BuyRequest buyRequest) throws JsonProcessingException {
+    public void requestPurchase(BuyRequest buyRequest) {
         try {
             var json = convertToJsonString(buyRequest);
             rabbitTemplate.convertAndSend(purchaseQueue.getName(), json);

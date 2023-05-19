@@ -6,8 +6,8 @@ import io.github.valtergabriell.mscards.application.domain.AccountCard;
 import io.github.valtergabriell.mscards.application.domain.Card;
 import io.github.valtergabriell.mscards.application.domain.ProductsBuyed;
 import io.github.valtergabriell.mscards.application.domain.dto.*;
-import io.github.valtergabriell.mscards.application.helpers.IdentifierValidation;
 import io.github.valtergabriell.mscards.application.helpers.CreateRandomNumbersToCard;
+import io.github.valtergabriell.mscards.application.helpers.IdentifierValidation;
 import io.github.valtergabriell.mscards.excpetions.RequestException;
 import io.github.valtergabriell.mscards.infra.queue.send.EmitShop;
 import io.github.valtergabriell.mscards.infra.repository.AccountCardRepository;
@@ -100,6 +100,7 @@ public class CardService extends CreateRandomNumbersToCard {
         int i = productValue.intValue();
         return i > 0;
     }
+
     public BuyResponse buySomething(String id, BuyRequest buyRequest) throws JsonProcessingException {
         IdentifierValidation identifierValidation = new IdentifierValidation();
         BuyResponse buyResponse = null;
@@ -146,5 +147,12 @@ public class CardService extends CreateRandomNumbersToCard {
         int newNumberOfInstallment = productsBuyed.getNumberOfInstallments() - numberOfInstallmentToPay;
         productsBuyed.setNumberOfInstallments(newNumberOfInstallment);
         payInvoiceResponse.setMessage("parcela paga!");
+    }
+
+    public void deleteCardByPersonIdentifier(String value) {
+        AccountCard accountCard = accountCardRepository.findByIdentifier(value);
+        Card card = accountCard.getCard();
+        accountCardRepository.delete(accountCard);
+        cardRepository.delete(card);
     }
 }
